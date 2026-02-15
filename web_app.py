@@ -8,15 +8,6 @@ from PIL import Image
 import time
 import random
 
-API_KEY = "AIzaSyCWaBUD3xJkE5H9U0JIOUXYSXsXeP_nejw" 
-
-try:
-    genai.configure(api_key=API_KEY)
-    model = genai.GenerativeModel('models/gemini-1.5-flash')
-except Exception as e:
-    st.error(f"Ошибка настройки ИИ: {e}")
-    model = None
-
 st.set_page_config(page_title="Help For Diabet People", page_icon="💙", layout="wide")
 
 if 'diabet_logs' not in st.session_state:
