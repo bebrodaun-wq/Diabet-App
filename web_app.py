@@ -14,10 +14,10 @@ try:
     genai.configure(api_key=API_KEY)
     model = genai.GenerativeModel('models/gemini-1.5-flash')
 except Exception as e:
-    st.error(f"Ошибка настройки ИИ: {e}")
+    st.error(f"AI Setup Error: {e}")
     model = None
 
-st.set_page_config(page_title="Help For Diabet People", page_icon="💙", layout="wide")
+st.set_page_config(page_title="Help For Diabetic People", page_icon="💙", layout="wide")
 
 if 'diabet_logs' not in st.session_state:
     st.session_state.diabet_logs = []
@@ -26,54 +26,47 @@ if 'user_steps' not in st.session_state:
 if 'user_water' not in st.session_state:
     st.session_state.user_water = 0.0
 
-# --- ИЗМЕНЕН ДИЗАЙН: CSS СТИЛИ (Wellness & Trust) ---
 st.markdown("""
     <style>
     @import url('https://fonts.googleapis.com/css2?family=Segoe+UI:wght@400;600;700&display=swap');
     
-    /* 1. Основной фон: Мягкий фарфор */
     .stApp { 
-        background-color: #F8F9FA; 
-        color: #2D3748; 
+        background-color: rgb(248, 249, 250); 
+        color: rgb(45, 55, 72); 
         font-family: 'Segoe UI', sans-serif; 
     }
     
-    /* 2. Вторичный цвет: Доверительный синий (Сайдбар) */
     [data-testid="stSidebar"] {
-        background-color: #2C5282 !important;
+        background-color: rgb(44, 82, 130) !important;
         border-right: none;
     }
     
-    /* Текст в сайдбаре - Белый */
     [data-testid="stSidebarNav"] span, 
     [data-testid="stSidebar"] label p, 
     .stRadio label p {
-        color: #FFFFFF !important;
+        color: rgb(255, 255, 255) !important;
         font-weight: 600 !important;
         font-size: 16px !important;
     }
 
-    /* Заголовки - Доверительный синий */
     label, .stMarkdown, [data-testid="stWidgetLabel"] p, h1, h2, h3 {
-        color: #2C5282 !important;
+        color: rgb(44, 82, 130) !important;
         font-weight: 700 !important;
     }
 
-    /* Таблицы - Белые, чистые */
     [data-testid="stTable"] {
-        background-color: #FFFFFF !important;
+        background-color: rgb(255, 255, 255) !important;
         border-radius: 8px;
         box-shadow: 0 1px 3px rgba(0,0,0,0.1);
         padding: 5px;
-        border: 1px solid #E2E8F0;
+        border: 1px solid rgb(226, 232, 240);
     }
     [data-testid="stTable"] td, [data-testid="stTable"] th, .dataframe td, .dataframe th {
-        color: #2D3748 !important;
+        color: rgb(45, 55, 72) !important;
     }
 
-    /* 3. Акцентный цвет: Оздоравливающая бирюза (Кнопки) */
     .stButton>button {
-        background-color: #38B2AC !important;
+        background-color: rgb(56, 178, 172) !important;
         color: white !important;
         border: none !important;
         border-radius: 6px !important;
@@ -82,27 +75,24 @@ st.markdown("""
         transition: 0.3s;
     }
     .stButton>button:hover {
-        background-color: #319795 !important;
+        background-color: rgb(49, 151, 149) !important;
         box-shadow: 0 4px 12px rgba(56, 178, 172, 0.3);
         transform: translateY(-1px);
     }
-    .stButton>button p { color: #ffffff !important; }
+    .stButton>button p { color: rgb(255, 255, 255) !important; }
 
-    /* Кнопки внутри форм */
     [data-testid="stForm"] button {
-        background-color: #38B2AC !important;
+        background-color: rgb(56, 178, 172) !important;
         border: none !important;
     }
 
-    /* Поля ввода - Белый фон с серой рамкой */
     input, textarea, [data-baseweb="select"] span {
-        background-color: #FFFFFF !important;
-        color: #2D3748 !important;
+        background-color: rgb(255, 255, 255) !important;
+        color: rgb(45, 55, 72) !important;
         border-radius: 6px !important;
-        border: 1px solid #E2E8F0 !important;
+        border: 1px solid rgb(226, 232, 240) !important;
     }
     
-    /* Брендовый блок в меню */
     .brand-container {
         padding: 20px 10px; text-align: center;
         background: rgba(255, 255, 255, 0.1);
@@ -110,50 +100,46 @@ st.markdown("""
         margin-bottom: 25px;
     }
     .brand-name {
-        color: #FFFFFF !important; font-size: 22px !important;
+        color: rgb(255, 255, 255) !important; font-size: 22px !important;
         font-weight: 800 !important; text-transform: uppercase;
     }
     
-    /* Карточки контента - Стиль медицинской карточки */
     .glass-card {
-        background: #FFFFFF; 
+        background: rgb(255, 255, 255); 
         border-radius: 12px;
         padding: 30px; margin-bottom: 25px; 
-        border: 1px solid #E2E8F0;
+        border: 1px solid rgb(226, 232, 240);
         box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
     }
     
     .recipe-card {
-        background: #FFFFFF; padding: 20px; border-radius: 12px;
-        border-left: 4px solid #38B2AC; margin-bottom: 15px;
+        background: rgb(255, 255, 255); padding: 20px; border-radius: 12px;
+        border-left: 4px solid rgb(56, 178, 172); margin-bottom: 15px;
         box-shadow: 0 2px 4px rgba(0,0,0,0.05);
-        border: 1px solid #E2E8F0;
+        border: 1px solid rgb(226, 232, 240);
     }
     
-    /* Теги пользы - Светло-бирюзовый */
     .benefit-tag { 
-        background: #E6FFFA; color: #285E61; padding: 4px 12px; 
+        background: rgb(230, 255, 250); color: rgb(40, 94, 97); padding: 4px 12px; 
         border-radius: 15px; font-size: 12px; font-weight: bold; margin-bottom: 5px; display: inline-block; 
-        border: 1px solid #B2F5EA;
+        border: 1px solid rgb(178, 245, 234);
     }
     
-    /* Блок вердикта - Акцент на бирюзу */
     .verdict-box {
-        background: #E6FFFA; 
-        border-left: 5px solid #38B2AC;
+        background: rgb(230, 255, 250); 
+        border-left: 5px solid rgb(56, 178, 172);
         padding: 20px; margin-top: 15px; border-radius: 4px;
-        color: #234E52;
+        color: rgb(35, 78, 82);
     }
     </style>
     """, unsafe_allow_html=True)
 
-# --- ИЗМЕНЕН ДИЗАЙН: ЦВЕТА ИНДИКАТОРОВ (Под медицинскую тему) ---
 def color_sugar(val):
     try:
         f_val = float(val)
-        if f_val > 7.2: return 'background-color: #FED7D7; color: #9B2C2C; font-weight: bold;' # Тревожный красный
-        if 4.0 <= f_val <= 7.2: return 'background-color: #C6F6D5; color: #22543D; font-weight: bold;' # Здоровый зеленый
-        return 'background-color: #BEE3F8; color: #2A4365; font-weight: bold;' # Низкий синий
+        if f_val > 7.2: return 'background-color: rgb(254, 215, 215); color: rgb(155, 44, 44); font-weight: bold;' 
+        if 4.0 <= f_val <= 7.2: return 'background-color: rgb(198, 246, 213); color: rgb(34, 84, 61); font-weight: bold;' 
+        return 'background-color: rgb(190, 227, 248); color: rgb(42, 67, 101); font-weight: bold;' 
     except: return ''
 
 def play_save_sound():
@@ -163,152 +149,152 @@ def play_save_sound():
 def get_table_download_link(df):
     csv = df.to_csv(index=False)
     b64 = base64.b64encode(csv.encode()).decode()
-    return f'<a href="data:file/csv;base64,{b64}" download="report.csv" style="color: #38B2AC; font-weight:bold;">📥 Скачать отчет (CSV)</a>'
+    return f'<a href="data:file/csv;base64,{b64}" download="report.csv" style="color: rgb(56, 178, 172); font-weight:bold;">📥 Download Report (CSV)</a>'
 
 with st.sidebar:
-    st.markdown("""<div class='brand-container'><div class='brand-name'>💙 Help For<br>Diabet People</div></div>""", unsafe_allow_html=True)
-    page = st.radio("НАВИГАЦИЯ:", ["🏠 Главная", "🏃 Активности", "🥗 Мировая Кухня", "🩺 Личный Журнал", "🎓 База Знаний"])
+    st.markdown("""<div class='brand-container'><div class='brand-name'>💙 Help For<br>Diabetic People</div></div>""", unsafe_allow_html=True)
+    page = st.radio("NAVIGATION:", ["🏠 Home", "🏃 Activities", "🥗 Global Kitchen", "🩺 Personal Log", "🎓 Knowledge Base"])
 
-if page == "🏠 Главная":
+if page == "🏠 Home":
     col1, col2 = st.columns([2, 1])
     with col1:
-        st.markdown("<div class='glass-card'><h1>Help For Diabet People</h1><p>Ваша надежная экосистема для управления диабетом.</p></div>", unsafe_allow_html=True)
+        st.markdown("<div class='glass-card'><h1>Help For Diabetic People</h1><p>Your reliable ecosystem for diabetes management.</p></div>", unsafe_allow_html=True)
         
-        # ДОБАВЛЕНО: Калькулятор ХЕ
-        st.subheader("🍞 Калькулятор Хлебных Единиц (ХЕ)")
+        st.subheader("🍞 Bread Units (BU) Calculator")
         carb_col, xe_col = st.columns(2)
-        with carb_col: carbs = st.number_input("Углеводы в порции (г):", 0, 100, 12)
-        with xe_col: xe_val = st.selectbox("1 ХЕ равна:", [10, 12], index=1)
-        st.info(f"Результат: **{carbs/xe_val:.1f} ХЕ**")
+        with carb_col: carbs = st.number_input("Carbs per serving (g):", 0, 100, 12)
+        with xe_col: xe_val = st.selectbox("1 BU equals:", [10, 12], index=1)
+        st.info(f"Result: **{carbs/xe_val:.1f} BU**")
 
-        st.subheader("📊 Мои показатели")
+        st.subheader("📊 My Metrics")
         v_col1, v_col2, v_col3 = st.columns(3)
-        with v_col1: steps = st.number_input("Введите шаги:", 0, 50000, st.session_state.user_steps)
-        with v_col2: water = st.number_input("Вода (литры):", 0.0, 10.0, st.session_state.user_water)
-        with v_col3: mood = st.select_slider("Ваше настроение:", options=["🚀 Отлично", "🙂 Хорошо", "😐 Средне", "😟 Устал", "🆘 Стресс"])
+        with v_col1: steps = st.number_input("Enter steps:", 0, 50000, st.session_state.user_steps)
+        with v_col2: water = st.number_input("Water (liters):", 0.0, 10.0, st.session_state.user_water)
+        with v_col3: mood = st.select_slider("Your mood:", options=["🚀 Excellent", "🙂 Good", "😐 Average", "😟 Tired", "🆘 Stress"])
         
         st.session_state.user_steps = steps
         st.session_state.user_water = water
 
-        st.markdown("<div class='verdict-box'><b>🤖 ИИ Вердикт:</b>", unsafe_allow_html=True)
+        st.markdown("<div class='verdict-box'><b>🤖 AI Verdict:</b>", unsafe_allow_html=True)
         verdicts = []
-        if steps < 5000: verdicts.append("🏃 Мало движений. Попробуйте пройтись, чтобы снизить риск скачка сахара.")
-        elif steps >= 10000: verdicts.append("✅ Прекрасная активность! Это повышает чувствительность к инсулину.")
-        if water < 1.5: verdicts.append("💧 Пейте больше воды для нормализации вязкости крови.")
-        if mood in ["😟 Устал", "🆘 Стресс"]: verdicts.append("🧘 Стресс поднимает сахар. Найдите 5 минут для отдыха.")
-        if not verdicts: verdicts.append("🌟 Вы отлично справляетесь!")
+        if steps < 5000: verdicts.append("🏃 Low activity. Try walking to reduce the risk of a sugar spike.")
+        elif steps >= 10000: verdicts.append("✅ Great activity! This improves insulin sensitivity.")
+        if water < 1.5: verdicts.append("💧 Drink more water to normalize blood viscosity.")
+        if mood in ["😟 Tired", "🆘 Stress"]: verdicts.append("🧘 Stress raises sugar. Find 5 minutes for relaxation.")
+        if not verdicts: verdicts.append("🌟 You are doing great!")
         st.write(" ".join(verdicts))
         st.markdown("</div>", unsafe_allow_html=True)
 
-        age = st.slider("Ваша возрастная категория", 1, 100, 25)
-        st.info(f"Рекомендуемый целевой диапазон: 4.4 - 7.2 ммоль/л")
+        age = st.slider("Your age category", 1, 100, 25)
+        st.info(f"Recommended target range: 4.4 - 7.2 mmol/L")
     with col2:
         st.image("https://images.unsplash.com/photo-1505751172876-fa1923c5c528?q=80&w=400")
 
-elif page == "🏃 Активности":
-    st.markdown("<div class='glass-card'><h1>🏃‍♂️ Активности и Спорт</h1><p>Регулярные нагрузки помогают контролировать уровень глюкозы.</p></div>", unsafe_allow_html=True)
+elif page == "🏃 Activities":
+    st.markdown("<div class='glass-card'><h1>🏃‍♂️ Activities and Sport</h1><p>Regular exercise helps control glucose levels.</p></div>", unsafe_allow_html=True)
     col_a, col_b = st.columns([1, 1])
     with col_a:
-        st.markdown("### 📉 Калькулятор спорта")
+        st.markdown("<h3>📉 Sport Calculator</h3>", unsafe_allow_html=True)
         sports_db = {
-            "Ходьба (спокойная)": 0.03, "Ходьба (быстрая)": 0.05, "Бег": 0.09, 
-            "Плавание": 0.07, "Велосипед": 0.06, "Йога": 0.02, "Теннис": 0.08, 
-            "Футбол": 0.1, "Танцы": 0.05, "Силовая тренировка": 0.04
+            "Walking (easy)": 0.03, "Walking (fast)": 0.05, "Running": 0.09, 
+            "Swimming": 0.07, "Cycling": 0.06, "Yoga": 0.02, "Tennis": 0.08, 
+            "Football": 0.1, "Dancing": 0.05, "Strength training": 0.04
         }
-        sport_type = st.selectbox("Вид спорта:", list(sports_db.keys()))
-        duration = st.slider("Продолжительность (мин):", 10, 180, 30)
+        sport_type = st.selectbox("Sport type:", list(sports_db.keys()))
+        duration = st.slider("Duration (min):", 10, 180, 30)
         total_burn = duration * sports_db[sport_type]
-        st.markdown(f"<div class='verdict-box' style='border-left-color: #38B2AC;'>🤖 Ожидаемое снижение сахара: <b>-{total_burn:.1f} ммоль/л</b></div>", unsafe_allow_html=True)
+        st.markdown(f"<div class='verdict-box' style='border-left-color: rgb(56, 178, 172);'>🤖 Expected sugar drop: <b>-{total_burn:.1f} mmol/L</b></div>", unsafe_allow_html=True)
         
         st.write("---")
-        user_goal = st.number_input("Цель по шагам:", 1000, 50000, 10000)
+        user_goal = st.number_input("Step goal:", 1000, 50000, 10000)
         st.progress(min(st.session_state.user_steps / user_goal, 1.0))
-        st.write(f"Пройдено сегодня: {st.session_state.user_steps} шагов")
+        st.write(f"Completed today: {st.session_state.user_steps} steps")
 
     with col_b:
-        st.image("https://images.unsplash.com/photo-1517836357463-d25dfeac3438?q=80&w=500", caption="Движение повышает чувствительность к инсулину")
-elif page == "🥗 Мировая Кухня":
-    st.header("🌎 Гурман-меню: 15 рецептов здоровья")
-    st.info("Все рецепты адаптированы для людей с диабетом: низкий ГИ и максимум пользы.")
+        st.image("https://images.unsplash.com/photo-1517836357463-d25dfeac3438?q=80&w=500")
+
+elif page == "🥗 Global Kitchen":
+    st.header("🌎 Gourmet Menu: 15 Recipes for Health")
+    st.info("All recipes are adapted for people with diabetes: low GI and maximum benefit.")
     
-    t_rec, t_ai = st.tabs(["🥘 Пошаговые рецепты", "🤖 ИИ Сканер состава"])
+    t_rec, t_ai = st.tabs(["🥘 Step-by-Step Recipes", "🤖 AI Ingredient Scanner"])
     
     with t_rec:
         recipes_database = [
             {
-                "country": "Греция", "title": "Салат Хориатики", "benefit": "Здоровые жиры",
-                "ing": "Огурцы, томаты, перец, фета, оливки Каламата, оливковое масло, орегано.",
-                "steps": ["Нарежьте овощи крупными кубиками (по-деревенски).", "Добавьте целые оливки и целый пласт феты сверху.", "Посыпьте сушеным орегано.", "Полейте маслом. Не перемешивайте до подачи!"]
+                "country": "Greece", "title": "Horiatiki Salad", "benefit": "Healthy Fats",
+                "ing": "Cucumbers, tomatoes, peppers, feta, Kalamata olives, olive oil, oregano.",
+                "steps": ["Cut vegetables into large cubes (village style).", "Add whole olives and a whole block of feta on top.", "Sprinkle with dried oregano.", "Drizzle with oil. Do not mix until serving!"]
             },
             {
-                "country": "Япония", "title": "Мисо-суп", "benefit": "Пробиотики",
-                "ing": "Паста мисо, сыр тофу, сушеные водоросли вакаме, зеленый лук.",
-                "steps": ["Замочите водоросли в воде на 5 минут.", "Доведите воду до кипения, добавьте нарезанный кубиками тофу.", "Разведите пасту мисо в отдельной чашке с теплой водой и влейте в кастрюлю.", "Снимите с огня (не кипятите мисо!), посыпьте луком."]
+                "country": "Japan", "title": "Miso Soup", "benefit": "Probiotics",
+                "ing": "Miso paste, tofu, dried wakame seaweed, green onions.",
+                "steps": ["Soak seaweed in water for 5 minutes.", "Bring water to a boil, add diced tofu.", "Dissolve miso paste in a separate cup with warm water and pour into the pot.", "Remove from heat (do not boil miso!), sprinkle with onions."]
             },
             {
-                "country": "Италия", "title": "Паста из кабачков (Zoodles)", "benefit": "Низкий ГИ",
-                "ing": "Молодые кабачки, чеснок, оливковое масло, пармезан, базилик.",
-                "steps": ["С помощью овощечистки или спец. терки нарежьте кабачок длинными тонкими полосками.", "Обжарьте чеснок на масле 1 минуту.", "Добавьте кабачки и жарьте всего 2-3 минуты (до состояния Al Dente).", "Посыпьте сыром и базиликом."]
+                "country": "Italy", "title": "Zucchini Pasta (Zoodles)", "benefit": "Low GI",
+                "ing": "Young zucchini, garlic, olive oil, parmesan, basil.",
+                "steps": ["Using a peeler or special grater, cut zucchini into long thin strips.", "Sauté garlic in oil for 1 minute.", "Add zucchini and fry for only 2-3 minutes (Al Dente).", "Sprinkle with cheese and basil."]
             },
             {
-                "country": "Индия", "title": "Красный Дал (Суп из чечевицы)", "benefit": "Клетчатка+",
-                "ing": "Красная чечевица, куркума, имбирь, чеснок, томаты в собств. соку.",
-                "steps": ["Промойте чечевицу и варите с куркумой 15 минут.", "На сковороде обжарьте тертый имбирь, чеснок и томаты.", "Смешайте зажарку с чечевицей.", "Варите еще 5 минут до кремообразного состояния."]
+                "country": "India", "title": "Red Dal (Lentil Soup)", "benefit": "Fiber+",
+                "ing": "Red lentils, turmeric, ginger, garlic, tomatoes in their own juice.",
+                "steps": ["Rinse lentils and boil with turmeric for 15 minutes.", "In a pan, sauté grated ginger, garlic, and tomatoes.", "Mix the sauté base with the lentils.", "Cook for another 5 minutes until creamy."]
             },
             {
-                "country": "Мексика", "title": "Гуакамоле", "benefit": "Омега-9",
-                "ing": "Спелое авокадо, сок лайма, кинза, красный лук, перец чили.",
-                "steps": ["Разомните мякоть авокадо вилкой (оставьте небольшие кусочки).", "Мелко нарежьте лук, кинзу и чили.", "Смешайте всё с соком лайма (он не даст авокадо потемнеть).", "Подавайте с палочками сельдерея вместо чипсов."]
+                "country": "Mexico", "title": "Guacamole", "benefit": "Omega-9",
+                "ing": "Ripe avocado, lime juice, cilantro, red onion, chili pepper.",
+                "steps": ["Mash avocado with a fork (leave some small chunks).", "Finely chop onion, cilantro, and chili.", "Mix everything with lime juice (it prevents browning).", "Serve with celery sticks instead of chips."]
             },
             {
-                "country": "Ливан", "title": "Табуле с киноа", "benefit": "Суперфуд",
-                "ing": "Киноа, огромный пучок петрушки, мята, помидоры, лимонный сок.",
-                "steps": ["Отварите киноа и остудите.", "Мелко-мелко порубите петрушку и мяту (зелени должно быть больше, чем крупы).", "Нарежьте помидоры мелкими кубиками.", "Заправьте лимонным соком и маслом."]
+                "country": "Lebanon", "title": "Quinoa Tabbouleh", "benefit": "Superfood",
+                "ing": "Quinoa, a large bunch of parsley, mint, tomatoes, lemon juice.",
+                "steps": ["Cook quinoa and let it cool.", "Finely chop parsley and mint (there should be more greens than grain).", "Dice tomatoes into small cubes.", "Season with lemon juice and oil."]
             },
             {
-                "country": "Норвегия", "title": "Лосось со спаржей", "benefit": "Белок",
-                "ing": "Филе лосося, спаржа, лимон, розмарин.",
-                "steps": ["Выложите филе на пергамент, посолите, добавьте розмарин.", "Рядом положите очищенную спаржу.", "Запекайте 15 минут при 180°C.", "Сбрызните свежим лимонным соком перед едой."]
+                "country": "Norway", "title": "Salmon with Asparagus", "benefit": "Protein",
+                "ing": "Salmon fillet, asparagus, lemon, rosemary.",
+                "steps": ["Place fillet on parchment, salt, and add rosemary.", "Place peeled asparagus next to it.", "Bake for 15 minutes at 180°C.", "Drizzle with fresh lemon juice before eating."]
             },
             {
-                "country": "Франция", "title": "Рататуй", "benefit": "Витамины",
-                "ing": "Баклажан, кабачок, перец, томатный соус без сахара.",
-                "steps": ["Нарежьте все овощи одинаковыми тонкими кружочками.", "Выложите их в форму 'гармошкой', чередуя цвета.", "Залейте томатным соусом со специями.", "Накройте фольгой и запекайте 40 минут."]
+                "country": "France", "title": "Ratatouille", "benefit": "Vitamins",
+                "ing": "Eggplant, zucchini, pepper, sugar-free tomato sauce.",
+                "steps": ["Cut all vegetables into identical thin circles.", "Arrange them in a dish 'accordion style', alternating colors.", "Pour tomato sauce with spices over it.", "Cover with foil and bake for 40 minutes."]
             },
             {
-                "country": "Таиланд", "title": "Том Ям с креветками", "benefit": "Метаболизм",
-                "ing": "Креветки, грибы вешенки, кокосовое молоко (немного), лемонграсс.",
-                "steps": ["Сварите легкий бульон на панцирях креветок и лемонграссе.", "Добавьте грибы и варите 5 минут.", "Влейте немного кокосового молока и добавьте очищенные креветки.", "Как только креветки порозовеют — суп готов."]
+                "country": "Thailand", "title": "Tom Yum with Shrimp", "benefit": "Metabolism",
+                "ing": "Shrimp, oyster mushrooms, a little coconut milk, lemongrass.",
+                "steps": ["Boil a light broth with shrimp shells and lemongrass.", "Add mushrooms and cook for 5 minutes.", "Add a bit of coconut milk and cleaned shrimp.", "As soon as the shrimp turn pink, the soup is ready."]
             },
             {
-                "country": "Грузия", "title": "Аджапсандал", "benefit": "Клетчатка",
-                "ing": "Баклажаны, болгарский перец, помидоры, много кинзы, чеснок.",
-                "steps": ["Запеките овощи целиком в духовке до мягкости.", "Снимите кожицу и нарежьте крупными полосками.", "Смешайте с давленым чесноком и рубленой кинзой.", "Дайте настояться 2 часа."]
+                "country": "Georgia", "title": "Ajapsandali", "benefit": "Fiber",
+                "ing": "Eggplants, bell peppers, tomatoes, lots of cilantro, garlic.",
+                "steps": ["Bake whole vegetables in the oven until soft.", "Remove skins and cut into large strips.", "Mix with crushed garlic and chopped cilantro.", "Let it sit for 2 hours."]
             },
             {
-                "country": "Турция", "title": "Бабагануш", "benefit": "Низкий сахар",
-                "ing": "Баклажаны, тахини (кунжутная паста), чеснок, оливковое масло.",
-                "steps": ["Проткните баклажаны вилкой и запекайте до черноты кожицы.", "Достаньте мякоть и взбейте блендером с тахини и чесноком.", "Добавьте каплю масла и паприку.", "Используйте как паштет для цельнозерновых хлебцев."]
+                "country": "Turkey", "title": "Baba Ganoush", "benefit": "Low Sugar",
+                "ing": "Eggplants, tahini (sesame paste), garlic, olive oil.",
+                "steps": ["Prick eggplants with a fork and bake until the skin turns black.", "Remove the pulp and blend with tahini and garlic.", "Add a drop of oil and paprika.", "Use as a spread for whole-grain crackers."]
             },
             {
-                "country": "Испания", "title": "Гаспачо", "benefit": "Антиоксиданты",
-                "ing": "Спелые томаты, огурец, болгарский перец, немного черствого цельнозернового хлеба.",
-                "steps": ["Очистите томаты от кожицы.", "Взбейте в блендере все овощи до однородности.", "Добавьте каплю винного уксуса и оливкового масла.", "Подавайте очень холодным."]
+                "country": "Spain", "title": "Gazpacho", "benefit": "Antioxidants",
+                "ing": "Ripe tomatoes, cucumber, bell pepper, some stale whole-grain bread.",
+                "steps": ["Peel the tomatoes.", "Blend all vegetables until smooth.", "Add a drop of wine vinegar and olive oil.", "Serve very cold."]
             },
             {
-                "country": "Вьетнам", "title": "Фо-Бо с лапшой Ширатаки", "benefit": "0 Калорий",
-                "ing": "Говяжья вырезка, бульон на костях, лапша ширатаки, анис, корица.",
-                "steps": ["Варите бульон со специями долго (минимум 3 часа).", "Промойте ширатаки под водой (в ней 0 калорий и углеводов!).", "Тонко нарежьте сырую говядину.", "Залейте лапшу и мясо кипящим бульоном (мясо сварится прямо в тарелке)."]
+                "country": "Vietnam", "title": "Pho-Bo with Shirataki Noodles", "benefit": "Zero Calories",
+                "ing": "Beef fillet, bone broth, shirataki noodles, star anise, cinnamon.",
+                "steps": ["Cook the broth with spices for a long time (at least 3 hours).", "Rinse the shirataki (it has 0 calories and carbs!).", "Thinly slice raw beef.", "Pour boiling broth over the noodles and meat (the meat cooks in the bowl)."]
             },
             {
-                "country": "Россия", "title": "Окрошка на кефире", "benefit": "Пробиотики",
-                "ing": "Отварная грудка, редис, огурец, яйцо, нежирный кефир.",
-                "steps": ["Нарежьте все ингредиенты мелкими кубиками.", "Порубите много укропа и зеленого лука.", "Смешайте и залейте холодным кефиром.", "Добавьте каплю горчицы для вкуса."]
+                "country": "Russia", "title": "Kefir Okroshka", "benefit": "Probiotics",
+                "ing": "Boiled chicken breast, radish, cucumber, egg, low-fat kefir.",
+                "steps": ["Cut all ingredients into small cubes.", "Chop lots of dill and green onions.", "Mix and pour cold kefir.", "Add a drop of mustard for taste."]
             },
             {
-                "country": "США", "title": "Салат Кобб", "benefit": "Сытость",
-                "ing": "Филе индейки, авокадо, яйцо, салат айсберг, томаты.",
-                "steps": ["Обжарьте индейку на гриле.", "Нарежьте все ингредиенты крупными кубиками.", "Выложите на блюдо рядами: ряд мяса, ряд авокадо, ряд яиц.", "Заправьте соусом из лимона и горчицы."]
+                "country": "USA", "title": "Cobb Salad", "benefit": "Satiety",
+                "ing": "Turkey fillet, avocado, egg, iceberg lettuce, tomatoes.",
+                "steps": ["Grill the turkey.", "Cut all ingredients into large cubes.", "Arrange on a platter in rows: meat, avocado, eggs.", "Season with lemon and mustard dressing."]
             }
         ]
 
@@ -317,177 +303,110 @@ elif page == "🥗 Мировая Кухня":
             with (c1 if i % 2 == 0 else c2):
                 with st.expander(f"📍 {r['country']} | {r['title']}"):
                     st.markdown(f"<span class='benefit-tag'>{r['benefit']}</span>", unsafe_allow_html=True)
-                    st.write(f"**🛒 Ингредиенты:** {r['ing']}")
-                    st.write("**👨‍🍳 Шаги приготовления:**")
+                    st.write(f"**🛒 Ingredients:** {r['ing']}")
+                    st.write("**👨‍🍳 Preparation Steps:**")
                     for j, step in enumerate(r['steps'], 1):
                         st.write(f"{j}. {step}")
 
     with t_ai:
-        st.markdown("<div class='glass-card'><h3>📸 Виртуальный анализ по фото</h3><p>Загрузите фото вашего блюда для анализа через Gemini AI.</p></div>", unsafe_allow_html=True)
-        
-        file_img = st.file_uploader("Загрузите фото тарелки", type=["jpg", "png", "jpeg"], key="food_scanner")
+        st.markdown("<div class='glass-card'><h3>📸 Virtual Analysis by Photo</h3><p>Upload a photo of your dish for Gemini AI analysis.</p></div>", unsafe_allow_html=True)
+        file_img = st.file_uploader("Upload plate photo", type=["jpg", "png", "jpeg"], key="food_scanner")
         if file_img:
             image = Image.open(file_img)
             st.image(image, width=400)
-            
-            if st.button("🚀 Начать анализ ИИ"):
+            if st.button("🚀 Start AI Analysis"):
                 if model:
-                    with st.spinner("Нейросеть анализирует..."):
-                        response = model.generate_content(["Определи блюдо, оцени БЖУ и дай совет диабетику на русском.", image])
+                    with st.spinner("Analyzing..."):
+                        response = model.generate_content(["Identify dish, estimate macronutrients, and give diabetic advice in English.", image])
                         st.markdown(f"<div class='verdict-box'>{response.text}</div>", unsafe_allow_html=True)
-                else:
-                    st.error("ИИ недоступен.")
 
-elif page == "🩺 Личный Журнал":
-    st.markdown("<div class='glass-card'><h3>🩺 Дневник замеров</h3></div>", unsafe_allow_html=True)
+elif page == "🩺 Personal Log":
+    st.markdown("<div class='glass-card'><h3>🩺 Measurement Log</h3></div>", unsafe_allow_html=True)
     with st.form("log"):
-        d, s, n = st.date_input("Дата"), st.number_input("Сахар (ммоль/л)", 2.0, 30.0, 5.5), st.text_area("Заметки")
-        if st.form_submit_button("Сохранить данные"):
-            st.session_state.diabet_logs.append({"Дата": d, "Сахар": s, "Заметки": n})
+        d, s, n = st.date_input("Date"), st.number_input("Sugar (mmol/L)", 2.0, 30.0, 5.5), st.text_area("Notes")
+        if st.form_submit_button("Save Data"):
+            st.session_state.diabet_logs.append({"Date": d, "Sugar": s, "Notes": n})
             play_save_sound() 
     
     if st.session_state.diabet_logs:
         df = pd.DataFrame(st.session_state.diabet_logs)
-        st.subheader("📈 Визуализация трендов")
+        st.subheader("📈 Trend Visualization")
         chart_df = df.copy()
-        chart_df['Дата'] = pd.to_datetime(chart_df['Дата'])
-        chart_df = chart_df.sort_values('Дата')
-        chart_df = chart_df.set_index('Дата')
-        st.line_chart(chart_df['Сахар'])
-        st.subheader("📋 История записей")
-        st.table(df.style.applymap(color_sugar, subset=['Сахар'])) 
+        chart_df['Date'] = pd.to_datetime(chart_df['Date'])
+        chart_df = chart_df.sort_values('Date').set_index('Date')
+        st.line_chart(chart_df['Sugar'])
+        st.subheader("📋 Entry History")
+        st.table(df.style.applymap(color_sugar, subset=['Sugar'])) 
         st.markdown(get_table_download_link(df), unsafe_allow_html=True)
 
-elif page == "🎓 База Знаний":
-    st.markdown("<div class='glass-card'><h1>Информационный Центр</h1></div>", unsafe_allow_html=True)
-    t1, t2 = st.tabs(["📜 Статьи и Графики", "🌟 10 Героев"])
+elif page == "🎓 Knowledge Base":
+    st.markdown("<div class='glass-card'><h1>Information Center</h1></div>", unsafe_allow_html=True)
+    t1, t2 = st.tabs(["📜 Articles and Charts", "🌟 20 Heroes"])
     
     with t1:
-        st.markdown("### 📚 10 Ключевых фактов и правил контроля")
-        
+        st.markdown("<h3>📚 10 Key Facts and Control Rules</h3>", unsafe_allow_html=True)
         facts = [
-            {
-                "title": "1. Механика обмена веществ",
-                "text": "Диабет — это не просто 'высокий сахар', а нарушение обмена веществ, где клеткам не хватает энергии из-за проблем с инсулином. Без него глюкоза остается в крови, повреждая сосуды."
-            },
-            {
-                "title": "2. Магия клетчатки",
-                "text": "Употребление овощей перед основным блюдом создает в кишечнике 'сетку', которая замедляет всасывание сахара. Это снижает постпрандиальный (после еды) пик глюкозы на 30%."
-            },
-            {
-                "title": "3. Скрытые сахара",
-                "text": "Берегитесь продуктов 'без сахара' и обезжиренных йогуртов. Часто туда добавляют мальтодекстрин или крахмал, которые поднимают сахар быстрее, чем обычный белый песок."
-            },
-            {
-                "title": "4. Мышцы как насос",
-                "text": "Физическая нагрузка открывает каналы в клетках без участия инсулина. Даже простая 15-минутная прогулка после ужина работает как естественное лекарство."
-            },
-            {
-                "title": "5. Опасность гипогликемии",
-                "text": "Резкое падение сахара (ниже 3.9) опаснее высокого уровня здесь и сейчас. Всегда имейте при себе 15г быстрых углеводов: сок или 3 кусочка сахара."
-            },
-            {
-                "title": "6. Гликированный гемоглобин (HbA1c)",
-                "text": "Это главный 'детектор лжи' для диабетика. Он показывает средний сахар за последние 3 месяца. Норма для большинства — ниже 7.0%."
-            },
-            {
-                "title": "7. Влияние стресса",
-                "text": "Гормон кортизол заставляет печень выбрасывать запасы глюкозы в кровь. Иногда 5 минут медитации снижают сахар эффективнее, чем диета."
-            },
-            {
-                "title": "8. Синдром утренней зари",
-                "text": "Рост сахара в 4-7 утра обусловлен выбросом гормонов роста. Если вы проснулись с высоким сахаром, хотя не ели на ночь — это работа вашей гормональной системы."
-            },
-            {
-                "title": "9. Здоровье сосудов и стоп",
-                "text": "Высокий сахар повреждает мелкие нервы (нейропатия). Ежедневный осмотр стоп — это критически важный ритуал, предотвращающий серьезные травмы."
-            },
-            {
-                "title": "10. Правило тарелки",
-                "text": "Используйте визуальный метод: 1/2 тарелки — зелень/овощи, 1/4 — белок (мясо/рыба), 1/4 — сложные углеводы (гречка/перловка). Это идеальный баланс."
-            }
+            {"title": "1. Metabolic Mechanics", "text": "Diabetes is not just 'high sugar' but a metabolic disorder where cells lack energy because glucose stays in the blood, damaging vessels."},
+            {"title": "2. Fiber Magic", "text": "Eating vegetables before the main dish creates a 'mesh' in the gut that slows sugar absorption, reducing postprandial peaks by 30%."},
+            {"title": "3. Hidden Sugars", "text": "Beware of 'sugar-free' products. Maltodextrin or starch can raise sugar faster than white sugar."},
+            {"title": "4. Muscles as Pumps", "text": "Physical activity opens cell channels without insulin. A simple 15-minute walk after dinner works as natural medicine."},
+            {"title": "5. Hypoglycemia Danger", "text": "A sharp drop (below 3.9) is more dangerous than high levels here and now. Always carry 15g of fast carbs (juice or 3 sugar cubes)."},
+            {"title": "6. HbA1c", "text": "This is the 'lie detector' for diabetics. It shows average sugar for the last 3 months. The target for most is below 7.0%."},
+            {"title": "7. Stress Impact", "text": "Cortisol forces the liver to release glucose stores. Sometimes 5 minutes of meditation lowers sugar better than a diet."},
+            {"title": "8. Dawn Phenomenon", "text": "Sugar rise between 4-7 AM is caused by growth hormones. If you wake up high without eating at night, it's your hormonal system at work."},
+            {"title": "9. Vascular & Foot Health", "text": "High sugar damages small nerves (neuropathy). Daily foot inspection is a critical ritual to prevent serious injuries."},
+            {"title": "10. Plate Rule", "text": "Use the visual method: 1/2 vegetables, 1/4 protein (meat/fish), 1/4 complex carbs (buckwheat/barley). Perfect balance."}
         ]
-
         for f in facts:
-            with st.expander(f["title"]):
-                st.write(f["text"])
+            with st.expander(f["title"]): st.write(f["text"])
         
         st.write("---")
-        st.subheader("📊 Статистика заболеваемости (2000 - 2026)")
+        st.subheader("📊 Morbidity Statistics (2000 - 2026)")
         years = list(range(2000, 2027))
         aktobe_vals = [2.2 + (i * 0.48) + (i**1.5) * 0.02 for i in range(len(years))]
         world_vals = [171 + (i * 14.5) + (i**1.6) * 0.4 for i in range(len(years))]
 
         st_col1, st_col2 = st.columns(2)
         with st_col1:
-            st.write("**📍 Актобе (тыс. чел)**")
-            df_akt = pd.DataFrame({"Год": years, "Больных": aktobe_vals}).set_index("Год")
-            st.area_chart(df_akt, color="#38B2AC") # Бирюзовый акцент
+            st.write("**📍 Aktobe (thousands)**")
+            st.area_chart(pd.DataFrame({"Year": years, "Patients": aktobe_vals}).set_index("Year"), color="rgb(56, 178, 172)")
         with st_col2:
-            st.write("**🌍 Весь мир (млн. чел)**")
-            df_wld = pd.DataFrame({"Год": years, "Больных": world_vals}).set_index("Год")
-            st.line_chart(df_wld, color="#2C5282") # Доверительный синий
-        
-        st.write("---")
-        st.subheader("📊 Аналитические графики болезни")
-        cg1, cg2 = st.columns(2)
-        with cg1:
-            st.write("**Динамика уровня глюкозы (типичный день)**")
-            time_data = pd.DataFrame(np.random.normal(5.8, 0.8, size=(24, 1)), columns=['ммоль/л'])
-            st.line_chart(time_data)
-        with cg2:
-            st.write("**Влияние различных нагрузок на сахар**")
-            impact_data = pd.DataFrame({'Снижение': [0.5, 1.2, 0.8, 1.5]}, index=['Йога', 'Бег', 'Ходьба', 'Бассейн'])
-            st.bar_chart(impact_data)
-
-        st.write("---")
-        st.subheader("🎥 Полезные видео-материалы")
-        st.markdown("""
-        * [🎥 Как вылечить ДИАБЕТ 2 типа: 7 шагов (Доктор Евдокименко)](http://www.youtube.com/watch?v=tryte6ZoXPo) — Простые и эффективные советы по лечению.
-        * [🎥 Что такое сахарный диабет простыми словами](https://www.youtube.com/watch?v=XfyGv-xwjlI) — Основы заболевания для новичков.
-        * [🎥 Принципы питания при диабете 1 и 2 типа](https://www.youtube.com/watch?v=ox-v7TfN0mY) — Как составить правильный рацион.
-        * [🎥 Как быстро снизить сахар: главные советы](http://www.youtube.com/watch?v=1xaBkGLhgR4) — Экспресс-рекомендации от эндокринолога.
-        * [🎥 5 советов для пациентов с диабетом 2 типа](http://www.youtube.com/watch?v=leKkGkHLkCs) — Коротко о самом важном в повседневной жизни.
-        * [🎥 Что действительно важно знать диабетику?](http://www.youtube.com/watch?v=iqV1EY6aSu8) — Ключевые аспекты самоконтроля.
-        * [🎥 Личный опыт: Жизнь с диабетом 1 типа](http://www.youtube.com/watch?v=NusIsLqQGpY) — Мотивирующая история и советы по адаптации.
-        """)
+            st.write("**🌍 World (millions)**")
+            st.line_chart(pd.DataFrame({"Year": years, "Patients": world_vals}).set_index("Year"), color="rgb(44, 82, 130)")
 
     with t2:
-        st.markdown("### 🌟 Знаменитости с диабетом")
-        
+        st.markdown("<h3>🌟 Celebrities with Diabetes</h3>", unsafe_allow_html=True)
         categories = {
-            "🎬 Кино и Шоу-бизнес": [
-                ("Джордж Лукас", "Создатель «Звездных войн». Узнал о диабете 2 типа в 23 года. Болезнь помогла ему избежать призыва в армию и сосредоточиться на кино. Он живет с диабетом уже более 50 лет!"),
-                ("Сильвестр Сталлоне", "Легендарный «Рокки» живет с СД 1 типа. Глядя на его физическую форму, сложно поверить, что он ежедневно контролирует сахар, но именно дисциплина сделала его суперзвездой."),
-                ("Лила Мосс", "Дочь супермодели Кейт Мосс. Она произвела фурор на подиуме, выйдя на показ Fendi x Versace с видимой инсулиновой помпой Omnipod на бедре, став иконой для подростков с СД1."),
-                ("Михаил Боярский", "Главный 'Д'Артаньян' России живет с диабетом много лет. Он строго следит за диетой и вовремя принимает лекарства, доказывая, что возраст и диагноз не помеха творчеству."),
-                ("Эльдар Джарахов", "Популярный блогер и музыкант. Открыто рассказывает о своей жизни с СД 1 типа, юмором и искренностью помогая миллионам подписчиков не унывать."),
-                ("Сальма Хайек", "Столкнулась с гестационным диабетом во время беременности. Это научило её ценить здоровое питание и внимательно относиться к сигналам своего тела."),
-                ("Джеймс Нортон", "Британский актер («Гранчестер»). Называет диабет своей 'суперсилой', так как болезнь развила в нем невероятную эмпатию. Иногда прячет таблетки глюкозы в костюмах героев.")
+            "🎬 Cinema and Show Business": [
+                ("George Lucas", "Creator of Star Wars. Found out about Type 2 at age 23. It helped him avoid the draft and focus on cinema. He has lived with it for over 50 years!"),
+                ("Sylvester Stallone", "The legendary Rocky lives with Type 1. His physical form proves that discipline and sugar control can make you a superstar."),
+                ("Lila Moss", "Daughter of Kate Moss. She made waves by walking the runway with her Omnipod insulin pump visible on her thigh, becoming an icon for T1D teens."),
+                ("Mikhail Boyarsky", "Russia's main 'D'Artagnan' has lived with diabetes for many years. He strictly follows his diet and medication, proving age is no barrier."),
+                ("Eldar Dzharakhov", "Popular musician. Openly talks about his life with T1D, helping millions of followers stay positive through humor."),
+                ("Salma Hayek", "Faced gestational diabetes during pregnancy. It taught her to value healthy eating and listen to her body's signals."),
+                ("James Norton", "British actor. Calls diabetes his 'superpower' because it developed incredible empathy in him. He sometimes hides glucose tabs in his costumes.")
             ],
-            "🏆 Легенды Спорта": [
-                ("Пеле", "Король футбола. Получил диагноз СД 1 типа в 17 лет, в самом начале пути. Это не помешало ему стать единственным трехкратным чемпионом мира в истории."),
-                ("Александр Зверев", "Олимпийский чемпион по теннису. Долго скрывал СД 1 типа, но теперь открыто делает инъекции прямо на корте во время перерывов, показывая, что спорт высших достижений возможен."),
-                ("Бобби Кларк", "Легенда НХЛ. В 13 лет ему сказали, что из-за диабета он никогда не будет играть профи. В итоге он стал капитаном «Филадельфии» и взял два Кубка Стэнли."),
-                ("Начо Фернандес", "Защитник «Реала». Врачи пророчили конец карьеры в 12 лет. Выиграл 6 Лиг Чемпионов. Секрет — идеальный контроль питания и нагрузок."),
-                ("Никита Кучеров", "Звезда НХЛ. Справляется с колоссальными нагрузками, будучи примером железной воли для всех атлетов с диабетом.")
+            "🏆 Sports Legends": [
+                ("Pele", "The King of Football. Diagnosed with Type 1 at age 17 at the start of his path. It didn't stop him from becoming a 3-time World Champion."),
+                ("Alexander Zverev", "Olympic tennis champion. Hid his T1D for a long time, but now openly injects insulin on court during breaks."),
+                ("Bobby Clarke", "NHL legend. At 13, he was told he'd never play pro. He became captain of the Flyers and won two Stanley Cups."),
+                ("Nacho Fernandez", "Real Madrid defender. Doctors predicted the end of his career at 12. He won 6 Champions Leagues with perfect control."),
+                ("Nikita Kucherov", "NHL star. Handles colossal loads, serving as an example of iron will for all athletes with diabetes.")
             ],
-            "🎤 Музыка и Искусство": [
-                ("Ник Джонас", "Музыкант из Jonas Brothers. Заболел в 13 лет. Основал фонд 'Beyond Type 1'. Его песня 'A Little Bit Longer' посвящена борьбе с болезнью."),
-                ("Элла Фицджеральд", "Первая леди джаза. Боролась с диабетом 2 типа почти всю жизнь, продолжая выступать и записывать мировые хиты до глубокой старости."),
-                ("Шэрон Стоун", "Кинодива с СД 1 типа. Сочетает йогу и медитацию, чтобы контролировать уровень сахара через управление стрессом."),
-                ("Холли Берри", "Первая темнокожая актриса, получившая 'Оскар'. Впала в кому на съемках в 19 лет, после чего кардинально изменила жизнь, выбрав кето-диету."),
-                ("Ванесса Уильямс", "Певица и актриса, первая темнокожая «Мисс Америка». Много лет активно поддерживает сообщества людей с диабетом 1 типа.")
+            "🎤 Music and Art": [
+                ("Nick Jonas", "Member of Jonas Brothers. Diagnosed at 13. Founded 'Beyond Type 1'. His song 'A Little Bit Longer' is dedicated to the struggle."),
+                ("Ella Fitzgerald", "The First Lady of Song. Fought Type 2 most of her life while recording world hits until old age."),
+                ("Sharon Stone", "Movie star with T1D. Combines yoga and meditation to control sugar through stress management."),
+                ("Halle Berry", "First Black actress to win an Oscar. Fell into a coma on set at 19, then changed her life entirely using a keto diet."),
+                ("Vanessa Williams", "Singer and actress. Actively supports T1D communities for many years.")
             ],
-            "📖 Исторические личности": [
-                ("Эрнест Хемингуэй", "Великий писатель жил с так называемым 'бронзовым диабетом'. Несмотря на это, он создал шедевры мировой литературы и вел экстремальный образ жизни."),
-                ("Пол Сезанн", "Отец современного искусства и импрессионизма. Творил свои великие полотна, несмотря на тяжелое течение диабета в эпоху до открытия инсулина."),
-                ("Том Хэнкс", "Узнал о СД 2 типа в 2013 году. Считает, что это следствие 'ленивого образа жизни' в молодости, и теперь является активным сторонником контроля веса.")
+            "📖 Historical Figures": [
+                ("Ernest Hemingway", "The great writer lived with 'bronze diabetes'. Despite this, he created masterpieces and led an extreme lifestyle."),
+                ("Paul Cezanne", "Father of modern art. Created his great canvases despite severe diabetes in the pre-insulin era."),
+                ("Tom Hanks", "Diagnosed with Type 2 in 2013. Believes it resulted from a lazy lifestyle in his youth and is now a weight control advocate.")
             ]
         }
-
         for cat_name, members in categories.items():
             st.subheader(cat_name)
             for name, bio in members:
-                with st.expander(f"👤 {name}"):
-                    st.write(bio)
+                with st.expander(f"👤 {name}"): st.write(bio)
