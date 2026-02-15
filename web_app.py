@@ -17,7 +17,8 @@ except Exception as e:
     st.error(f"Ошибка настройки ИИ: {e}")
     model = None
 
-st.set_page_config(page_title="Help For Diabet People", page_icon="💙", layout="wide")
+# --- ИЗМЕНЕН ДИЗАЙН: Иконка ---
+st.set_page_config(page_title="Help For Diabet People", page_icon="🌿", layout="wide")
 
 if 'diabet_logs' not in st.session_state:
     st.session_state.diabet_logs = []
@@ -26,99 +27,128 @@ if 'user_steps' not in st.session_state:
 if 'user_water' not in st.session_state:
     st.session_state.user_water = 0.0
 
+# --- ИЗМЕНЕН ДИЗАЙН: CSS СТИЛИ (Nature Soft) ---
 st.markdown("""
     <style>
-    @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;800&display=swap');
+    @import url('https://fonts.googleapis.com/css2?family=Segoe+UI:wght@400;600;700&display=swap');
     
-    .stApp { background: #0b0f19; color: #ffffff; font-family: 'Montserrat', sans-serif; }
+    /* Основной фон - теплый кремовый (приятный для глаз) */
+    .stApp { 
+        background-color: #fdfaf5; 
+        color: #2d3436; 
+        font-family: 'Segoe UI', sans-serif; 
+    }
     
+    /* Сайдбар - глубокий природный зеленый */
+    [data-testid="stSidebar"] {
+        background-color: #2d4038 !important;
+        border-right: none;
+    }
+    
+    /* Текст в сайдбаре - светлый */
     [data-testid="stSidebarNav"] span, 
     [data-testid="stSidebar"] label p, 
     .stRadio label p {
-        color: #ffffff !important;
-        font-weight: 700 !important;
+        color: #fdfaf5 !important;
+        font-weight: 600 !important;
         font-size: 16px !important;
     }
 
-    label, .stMarkdown, [data-testid="stWidgetLabel"] p {
-        color: #ffffff !important;
-        font-weight: 600 !important;
+    /* Заголовки - темный хвойный */
+    label, .stMarkdown, [data-testid="stWidgetLabel"] p, h1, h2, h3 {
+        color: #2d4038 !important;
+        font-weight: 700 !important;
     }
 
+    /* Таблицы - белые с мягкой тенью */
     [data-testid="stTable"] {
         background-color: #ffffff !important;
-        border-radius: 10px;
-        padding: 15px;
+        border-radius: 15px;
+        box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+        padding: 5px;
     }
     [data-testid="stTable"] td, [data-testid="stTable"] th, .dataframe td, .dataframe th {
-        color: #000000 !important;
-        font-size: 16px !important;
+        color: #2d3436 !important;
     }
 
+    /* Кнопки - Терракотовый (теплый акцент) */
     .stButton>button {
-        background-color: #fbbf24 !important;
+        background-color: #d68060 !important;
+        color: white !important;
         border: none !important;
-        border-radius: 12px !important;
+        border-radius: 25px !important;
+        font-weight: 600 !important;
+        padding: 0.5rem 2rem !important;
+        transition: 0.3s;
     }
-    .stButton>button p { color: #000000 !important; font-weight: 700 !important; }
+    .stButton>button:hover {
+        background-color: #bc6b4d !important;
+        transform: translateY(-2px);
+    }
+    .stButton>button p { color: #ffffff !important; }
 
+    /* Кнопки внутри форм */
     [data-testid="stForm"] button {
-        background-color: #3b82f6 !important;
-        border: 1px solid #ffffff !important;
-        color: #ffffff !important;
-    }
-    [data-testid="stForm"] button p {
-        color: #ffffff !important;
-        font-weight: 700 !important;
+        background-color: #d68060 !important;
+        border: none !important;
     }
 
+    /* Поля ввода - белый фон */
     input, textarea, [data-baseweb="select"] span {
-        color: #0b0f19 !important;
+        background-color: #ffffff !important;
+        color: #2d4038 !important;
+        border-radius: 10px !important;
     }
     
-    [data-testid="stSidebar"] {
-        background-color: #1e293b !important;
-        border-right: 1px solid #3b82f6;
-    }
-    
+    /* Брендовый блок в меню */
     .brand-container {
         padding: 20px 10px; text-align: center;
-        background: linear-gradient(145deg, #1e293b, #0f172a);
-        border-radius: 15px; border: 1px solid #fbbf24; margin-bottom: 25px;
+        background: rgba(255, 255, 255, 0.1);
+        border-radius: 15px; border: 1px solid rgba(255,255,255,0.2); 
+        margin-bottom: 25px;
     }
     .brand-name {
-        color: #fbbf24 !important; font-size: 22px !important;
+        color: #fdfaf5 !important; font-size: 22px !important;
         font-weight: 800 !important; text-transform: uppercase;
     }
     
+    /* Карточки контента - Белые, чистые */
     .glass-card {
-        background: rgba(30, 41, 59, 0.7); border-radius: 20px;
-        padding: 30px; margin-bottom: 25px; border: 1px solid rgba(96, 165, 250, 0.2);
+        background: #ffffff; 
+        border-radius: 20px;
+        padding: 30px; margin-bottom: 25px; 
+        border: 1px solid #efebe0;
+        box-shadow: 0 10px 20px rgba(45, 64, 56, 0.05);
     }
     
-    h1, h2, h3 { color: #fbbf24 !important; }
     .recipe-card {
-        background: #1e293b; padding: 20px; border-radius: 15px;
-        border-right: 4px solid #10b981; margin-bottom: 15px;
-    }
-    .benefit-tag { 
-        background: #064e3b; color: #34d399; padding: 4px 10px; 
-        border-radius: 10px; font-size: 12px; font-weight: bold; margin-bottom: 5px; display: inline-block; 
+        background: #ffffff; padding: 20px; border-radius: 15px;
+        border-right: 4px solid #588157; margin-bottom: 15px;
+        box-shadow: 0 4px 10px rgba(0,0,0,0.03);
     }
     
+    /* Теги пользы - мягкий зеленый */
+    .benefit-tag { 
+        background: #e9edc9; color: #3a5a40; padding: 4px 12px; 
+        border-radius: 15px; font-size: 12px; font-weight: bold; margin-bottom: 5px; display: inline-block; 
+    }
+    
+    /* Блок вердикта - песочный */
     .verdict-box {
-        background: rgba(251, 191, 36, 0.1); border-left: 5px solid #fbbf24;
-        padding: 15px; margin-top: 15px; border-radius: 10px;
+        background: #fefae0; border-left: 5px solid #dda15e;
+        padding: 20px; margin-top: 15px; border-radius: 10px;
+        color: #606c38;
     }
     </style>
     """, unsafe_allow_html=True)
 
+# --- ИЗМЕНЕН ДИЗАЙН: ЦВЕТА ИНДИКАТОРОВ (Под светлую тему) ---
 def color_sugar(val):
     try:
         f_val = float(val)
-        if f_val > 7.2: return 'background-color: #ef4444; color: white; font-weight: bold;'
-        if 4.0 <= f_val <= 7.2: return 'background-color: #10b981; color: white; font-weight: bold;'
-        return 'background-color: #3b82f6; color: white; font-weight: bold;'
+        if f_val > 7.2: return 'background-color: #f28482; color: white; font-weight: bold;' # Мягкий красный
+        if 4.0 <= f_val <= 7.2: return 'background-color: #84a59d; color: white; font-weight: bold;' # Мягкий зеленый
+        return 'background-color: #a5a58d; color: white; font-weight: bold;' # Оливковый
     except: return ''
 
 def play_save_sound():
@@ -128,10 +158,10 @@ def play_save_sound():
 def get_table_download_link(df):
     csv = df.to_csv(index=False)
     b64 = base64.b64encode(csv.encode()).decode()
-    return f'<a href="data:file/csv;base64,{b64}" download="report.csv" style="color: #fbbf24;">📥 Скачать отчет (CSV)</a>'
+    return f'<a href="data:file/csv;base64,{b64}" download="report.csv" style="color: #d68060;">📥 Скачать отчет (CSV)</a>'
 
 with st.sidebar:
-    st.markdown("""<div class='brand-container'><div class='brand-name'>💙 Help For<br>Diabet People</div></div>""", unsafe_allow_html=True)
+    st.markdown("""<div class='brand-container'><div class='brand-name'>🌿 Help For<br>Diabet People</div></div>""", unsafe_allow_html=True)
     page = st.radio("НАВИГАЦИЯ:", ["🏠 Главная", "🏃 Активности", "🥗 Мировая Кухня", "🩺 Личный Журнал", "🎓 База Знаний"])
 
 if page == "🏠 Главная":
@@ -183,7 +213,7 @@ elif page == "🏃 Активности":
         sport_type = st.selectbox("Вид спорта:", list(sports_db.keys()))
         duration = st.slider("Продолжительность (мин):", 10, 180, 30)
         total_burn = duration * sports_db[sport_type]
-        st.markdown(f"<div class='verdict-box' style='border-left-color: #10b981;'>🤖 Ожидаемое снижение сахара: <b>-{total_burn:.1f} ммоль/л</b></div>", unsafe_allow_html=True)
+        st.markdown(f"<div class='verdict-box' style='border-left-color: #588157;'>🤖 Ожидаемое снижение сахара: <b>-{total_burn:.1f} ммоль/л</b></div>", unsafe_allow_html=True)
         
         st.write("---")
         user_goal = st.number_input("Цель по шагам:", 1000, 50000, 10000)
@@ -387,11 +417,11 @@ elif page == "🎓 База Знаний":
         with st_col1:
             st.write("**📍 Актобе (тыс. чел)**")
             df_akt = pd.DataFrame({"Год": years, "Больных": aktobe_vals}).set_index("Год")
-            st.area_chart(df_akt, color="#fbbf24")
+            st.area_chart(df_akt, color="#d68060") # Изменен цвет графика под тему
         with st_col2:
             st.write("**🌍 Весь мир (млн. чел)**")
             df_wld = pd.DataFrame({"Год": years, "Больных": world_vals}).set_index("Год")
-            st.line_chart(df_wld, color="#3b82f6")
+            st.line_chart(df_wld, color="#588157") # Изменен цвет графика под тему
         
         st.write("---")
         st.subheader("📊 Аналитические графики болезни")
