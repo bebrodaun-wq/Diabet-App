@@ -17,8 +17,7 @@ except Exception as e:
     st.error(f"Ошибка настройки ИИ: {e}")
     model = None
 
-# --- ИЗМЕНЕН ДИЗАЙН: Иконка ---
-st.set_page_config(page_title="Help For Diabet People", page_icon="🌿", layout="wide")
+st.set_page_config(page_title="Help For Diabet People", page_icon="💙", layout="wide")
 
 if 'diabet_logs' not in st.session_state:
     st.session_state.diabet_logs = []
@@ -27,128 +26,134 @@ if 'user_steps' not in st.session_state:
 if 'user_water' not in st.session_state:
     st.session_state.user_water = 0.0
 
-# --- ИЗМЕНЕН ДИЗАЙН: CSS СТИЛИ (Nature Soft) ---
+# --- ИЗМЕНЕН ДИЗАЙН: CSS СТИЛИ (Wellness & Trust) ---
 st.markdown("""
     <style>
     @import url('https://fonts.googleapis.com/css2?family=Segoe+UI:wght@400;600;700&display=swap');
     
-    /* Основной фон - теплый кремовый (приятный для глаз) */
+    /* 1. Основной фон: Мягкий фарфор */
     .stApp { 
-        background-color: #fdfaf5; 
-        color: #2d3436; 
+        background-color: #F8F9FA; 
+        color: #2D3748; 
         font-family: 'Segoe UI', sans-serif; 
     }
     
-    /* Сайдбар - глубокий природный зеленый */
+    /* 2. Вторичный цвет: Доверительный синий (Сайдбар) */
     [data-testid="stSidebar"] {
-        background-color: #2d4038 !important;
+        background-color: #2C5282 !important;
         border-right: none;
     }
     
-    /* Текст в сайдбаре - светлый */
+    /* Текст в сайдбаре - Белый */
     [data-testid="stSidebarNav"] span, 
     [data-testid="stSidebar"] label p, 
     .stRadio label p {
-        color: #fdfaf5 !important;
+        color: #FFFFFF !important;
         font-weight: 600 !important;
         font-size: 16px !important;
     }
 
-    /* Заголовки - темный хвойный */
+    /* Заголовки - Доверительный синий */
     label, .stMarkdown, [data-testid="stWidgetLabel"] p, h1, h2, h3 {
-        color: #2d4038 !important;
+        color: #2C5282 !important;
         font-weight: 700 !important;
     }
 
-    /* Таблицы - белые с мягкой тенью */
+    /* Таблицы - Белые, чистые */
     [data-testid="stTable"] {
-        background-color: #ffffff !important;
-        border-radius: 15px;
-        box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+        background-color: #FFFFFF !important;
+        border-radius: 8px;
+        box-shadow: 0 1px 3px rgba(0,0,0,0.1);
         padding: 5px;
+        border: 1px solid #E2E8F0;
     }
     [data-testid="stTable"] td, [data-testid="stTable"] th, .dataframe td, .dataframe th {
-        color: #2d3436 !important;
+        color: #2D3748 !important;
     }
 
-    /* Кнопки - Терракотовый (теплый акцент) */
+    /* 3. Акцентный цвет: Оздоравливающая бирюза (Кнопки) */
     .stButton>button {
-        background-color: #d68060 !important;
+        background-color: #38B2AC !important;
         color: white !important;
         border: none !important;
-        border-radius: 25px !important;
+        border-radius: 6px !important;
         font-weight: 600 !important;
         padding: 0.5rem 2rem !important;
         transition: 0.3s;
     }
     .stButton>button:hover {
-        background-color: #bc6b4d !important;
-        transform: translateY(-2px);
+        background-color: #319795 !important;
+        box-shadow: 0 4px 12px rgba(56, 178, 172, 0.3);
+        transform: translateY(-1px);
     }
     .stButton>button p { color: #ffffff !important; }
 
     /* Кнопки внутри форм */
     [data-testid="stForm"] button {
-        background-color: #d68060 !important;
+        background-color: #38B2AC !important;
         border: none !important;
     }
 
-    /* Поля ввода - белый фон */
+    /* Поля ввода - Белый фон с серой рамкой */
     input, textarea, [data-baseweb="select"] span {
-        background-color: #ffffff !important;
-        color: #2d4038 !important;
-        border-radius: 10px !important;
+        background-color: #FFFFFF !important;
+        color: #2D3748 !important;
+        border-radius: 6px !important;
+        border: 1px solid #E2E8F0 !important;
     }
     
     /* Брендовый блок в меню */
     .brand-container {
         padding: 20px 10px; text-align: center;
         background: rgba(255, 255, 255, 0.1);
-        border-radius: 15px; border: 1px solid rgba(255,255,255,0.2); 
+        border-radius: 8px; border: 1px solid rgba(255,255,255,0.2); 
         margin-bottom: 25px;
     }
     .brand-name {
-        color: #fdfaf5 !important; font-size: 22px !important;
+        color: #FFFFFF !important; font-size: 22px !important;
         font-weight: 800 !important; text-transform: uppercase;
     }
     
-    /* Карточки контента - Белые, чистые */
+    /* Карточки контента - Стиль медицинской карточки */
     .glass-card {
-        background: #ffffff; 
-        border-radius: 20px;
+        background: #FFFFFF; 
+        border-radius: 12px;
         padding: 30px; margin-bottom: 25px; 
-        border: 1px solid #efebe0;
-        box-shadow: 0 10px 20px rgba(45, 64, 56, 0.05);
+        border: 1px solid #E2E8F0;
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
     }
     
     .recipe-card {
-        background: #ffffff; padding: 20px; border-radius: 15px;
-        border-right: 4px solid #588157; margin-bottom: 15px;
-        box-shadow: 0 4px 10px rgba(0,0,0,0.03);
+        background: #FFFFFF; padding: 20px; border-radius: 12px;
+        border-left: 4px solid #38B2AC; margin-bottom: 15px;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+        border: 1px solid #E2E8F0;
     }
     
-    /* Теги пользы - мягкий зеленый */
+    /* Теги пользы - Светло-бирюзовый */
     .benefit-tag { 
-        background: #e9edc9; color: #3a5a40; padding: 4px 12px; 
+        background: #E6FFFA; color: #285E61; padding: 4px 12px; 
         border-radius: 15px; font-size: 12px; font-weight: bold; margin-bottom: 5px; display: inline-block; 
+        border: 1px solid #B2F5EA;
     }
     
-    /* Блок вердикта - песочный */
+    /* Блок вердикта - Акцент на бирюзу */
     .verdict-box {
-        background: #fefae0; border-left: 5px solid #dda15e;
-        padding: 20px; margin-top: 15px; border-radius: 10px;
-        color: #606c38;
+        background: #E6FFFA; 
+        border-left: 5px solid #38B2AC;
+        padding: 20px; margin-top: 15px; border-radius: 4px;
+        color: #234E52;
     }
     </style>
     """, unsafe_allow_html=True)
 
-# --- ИЗМЕНЕН ДИЗАЙН: ЦВЕТА ИНДИКАТОРОВ (Под светлую тему) ---
+# --- ИЗМЕНЕН ДИЗАЙН: ЦВЕТА ИНДИКАТОРОВ (Под медицинскую тему) ---
 def color_sugar(val):
     try:
         f_val = float(val)
-        if f_val > 7.2: return 'background-color: #f28482; color: white; font-weight: bold;' # Мягкий красный
-        if 4.0 <= f_val <= 7.2: return 'background-color: #84a59d; color: white; font-weight: bold;' # Мягкий зеленый
-        return 'background-color: #a5a58d; color: white; font-weight: bold;' # Оливковый
+        if f_val > 7.2: return 'background-color: #FED7D7; color: #9B2C2C; font-weight: bold;' # Тревожный красный
+        if 4.0 <= f_val <= 7.2: return 'background-color: #C6F6D5; color: #22543D; font-weight: bold;' # Здоровый зеленый
+        return 'background-color: #BEE3F8; color: #2A4365; font-weight: bold;' # Низкий синий
     except: return ''
 
 def play_save_sound():
@@ -158,10 +163,10 @@ def play_save_sound():
 def get_table_download_link(df):
     csv = df.to_csv(index=False)
     b64 = base64.b64encode(csv.encode()).decode()
-    return f'<a href="data:file/csv;base64,{b64}" download="report.csv" style="color: #d68060;">📥 Скачать отчет (CSV)</a>'
+    return f'<a href="data:file/csv;base64,{b64}" download="report.csv" style="color: #38B2AC; font-weight:bold;">📥 Скачать отчет (CSV)</a>'
 
 with st.sidebar:
-    st.markdown("""<div class='brand-container'><div class='brand-name'>🌿 Help For<br>Diabet People</div></div>""", unsafe_allow_html=True)
+    st.markdown("""<div class='brand-container'><div class='brand-name'>💙 Help For<br>Diabet People</div></div>""", unsafe_allow_html=True)
     page = st.radio("НАВИГАЦИЯ:", ["🏠 Главная", "🏃 Активности", "🥗 Мировая Кухня", "🩺 Личный Журнал", "🎓 База Знаний"])
 
 if page == "🏠 Главная":
@@ -213,7 +218,7 @@ elif page == "🏃 Активности":
         sport_type = st.selectbox("Вид спорта:", list(sports_db.keys()))
         duration = st.slider("Продолжительность (мин):", 10, 180, 30)
         total_burn = duration * sports_db[sport_type]
-        st.markdown(f"<div class='verdict-box' style='border-left-color: #588157;'>🤖 Ожидаемое снижение сахара: <b>-{total_burn:.1f} ммоль/л</b></div>", unsafe_allow_html=True)
+        st.markdown(f"<div class='verdict-box' style='border-left-color: #38B2AC;'>🤖 Ожидаемое снижение сахара: <b>-{total_burn:.1f} ммоль/л</b></div>", unsafe_allow_html=True)
         
         st.write("---")
         user_goal = st.number_input("Цель по шагам:", 1000, 50000, 10000)
@@ -417,11 +422,11 @@ elif page == "🎓 База Знаний":
         with st_col1:
             st.write("**📍 Актобе (тыс. чел)**")
             df_akt = pd.DataFrame({"Год": years, "Больных": aktobe_vals}).set_index("Год")
-            st.area_chart(df_akt, color="#d68060") # Изменен цвет графика под тему
+            st.area_chart(df_akt, color="#38B2AC") # Бирюзовый акцент
         with st_col2:
             st.write("**🌍 Весь мир (млн. чел)**")
             df_wld = pd.DataFrame({"Год": years, "Больных": world_vals}).set_index("Год")
-            st.line_chart(df_wld, color="#588157") # Изменен цвет графика под тему
+            st.line_chart(df_wld, color="#2C5282") # Доверительный синий
         
         st.write("---")
         st.subheader("📊 Аналитические графики болезни")
