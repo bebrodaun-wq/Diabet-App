@@ -19,96 +19,82 @@ except Exception as e:
 
 st.set_page_config(page_title="Help For Diabet People", page_icon="💙", layout="wide")
 
-if 'diabet_logs' not in st.session_state:
-    st.session_state.diabet_logs = []
-if 'user_steps' not in st.session_state:
-    st.session_state.user_steps = 0
-if 'user_water' not in st.session_state:
-    st.session_state.user_water = 0.0
-
 st.markdown("""
     <style>
-    @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;800&display=swap');
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&display=swap');
     
-    .stApp { background: #0b0f19; color: #ffffff; font-family: 'Montserrat', sans-serif; }
-    
-    [data-testid="stSidebarNav"] span, 
-    [data-testid="stSidebar"] label p, 
-    .stRadio label p {
-        color: #ffffff !important;
-        font-weight: 700 !important;
-        font-size: 16px !important;
+    .stApp {
+        background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+        color: #2d3436;
+        font-family: 'Inter', sans-serif;
     }
 
-    label, .stMarkdown, [data-testid="stWidgetLabel"] p {
-        color: #ffffff !important;
-        font-weight: 600 !important;
-    }
-
-    [data-testid="stTable"] {
-        background-color: #ffffff !important;
-        border-radius: 10px;
-        padding: 15px;
-    }
-    [data-testid="stTable"] td, [data-testid="stTable"] th, .dataframe td, .dataframe th {
-        color: #000000 !important;
-        font-size: 16px !important;
-    }
-
-    .stButton>button {
-        background-color: #fbbf24 !important;
-        border: none !important;
-        border-radius: 12px !important;
-    }
-    .stButton>button p { color: #000000 !important; font-weight: 700 !important; }
-
-    [data-testid="stForm"] button {
-        background-color: #3b82f6 !important;
-        border: 1px solid #ffffff !important;
-        color: #ffffff !important;
-    }
-    [data-testid="stForm"] button p {
-        color: #ffffff !important;
-        font-weight: 700 !important;
-    }
-
-    input, textarea, [data-baseweb="select"] span {
-        color: #0b0f19 !important;
-    }
-    
     [data-testid="stSidebar"] {
-        background-color: #1e293b !important;
-        border-right: 1px solid #3b82f6;
-    }
-    
-    .brand-container {
-        padding: 20px 10px; text-align: center;
-        background: linear-gradient(145deg, #1e293b, #0f172a);
-        border-radius: 15px; border: 1px solid #fbbf24; margin-bottom: 25px;
-    }
-    .brand-name {
-        color: #fbbf24 !important; font-size: 22px !important;
-        font-weight: 800 !important; text-transform: uppercase;
+        background-color: #ffffff !important;
+        border-right: 1px solid #e0e0e0;
     }
     
     .glass-card {
-        background: rgba(30, 41, 59, 0.7); border-radius: 20px;
-        padding: 30px; margin-bottom: 25px; border: 1px solid rgba(96, 165, 250, 0.2);
+        background: rgba(255, 255, 255, 0.8);
+        border-radius: 20px;
+        padding: 25px;
+        box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.07);
+        border: 1px solid rgba(255, 255, 255, 0.18);
+        margin-bottom: 20px;
+        color: #2d3436;
     }
-    
-    h1, h2, h3 { color: #fbbf24 !important; }
-    .recipe-card {
-        background: #1e293b; padding: 20px; border-radius: 15px;
-        border-right: 4px solid #10b981; margin-bottom: 15px;
+
+    h1, h2, h3 {
+        color: #4834d4 !important; /* Глубокий синий */
+        font-weight: 700 !important;
     }
-    .benefit-tag { 
-        background: #064e3b; color: #34d399; padding: 4px 10px; 
-        border-radius: 10px; font-size: 12px; font-weight: bold; margin-bottom: 5px; display: inline-block; 
+
+    .stButton>button {
+        background: linear-gradient(90deg, #6c5ce7, #a29bfe) !important;
+        color: white !important;
+        border: none !important;
+        border-radius: 12px !important;
+        padding: 0.5rem 2rem !important;
+        transition: all 0.3s ease;
+        font-weight: 600 !important;
     }
-    
+    .stButton>button:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 5px 15px rgba(108, 92, 231, 0.4);
+
+    input, textarea {
+        border-radius: 10px !important;
+        border: 1px solid #dcdde1 !important;
+    }
+
     .verdict-box {
-        background: rgba(251, 191, 36, 0.1); border-left: 5px solid #fbbf24;
-        padding: 15px; margin-top: 15px; border-radius: 10px;
+        background: #e3f2fd; 
+        border-left: 5px solid #2196f3;
+        padding: 15px;
+        border-radius: 10px;
+        color: #0d47a1;
+    }
+
+    .benefit-tag { 
+        background: #e8f5e9; 
+        color: #2e7d32; 
+        padding: 4px 12px; 
+        border-radius: 20px; 
+        font-size: 12px; 
+        font-weight: 600;
+    }
+    
+    .brand-container {
+        padding: 20px;
+        text-align: center;
+        background: #f8f9fa;
+        border-radius: 15px;
+        margin-bottom: 20px;
+    }
+    .brand-name {
+        color: #4834d4 !important;
+        font-size: 20px !important;
+        font-weight: 800 !important;
     }
     </style>
     """, unsafe_allow_html=True)
@@ -116,11 +102,10 @@ st.markdown("""
 def color_sugar(val):
     try:
         f_val = float(val)
-        if f_val > 7.2: return 'background-color: #ef4444; color: white; font-weight: bold;'
-        if 4.0 <= f_val <= 7.2: return 'background-color: #10b981; color: white; font-weight: bold;'
-        return 'background-color: #3b82f6; color: white; font-weight: bold;'
+        if f_val > 7.2: return 'background-color: #ffcccc; color: #cc0000; font-weight: bold;'
+        if 4.0 <= f_val <= 7.2: return 'background-color: #d4edda; color: #155724; font-weight: bold;'
+        return 'background-color: #d1ecf1; color: #0c5460; font-weight: bold;'
     except: return ''
-
 def play_save_sound():
     sound_url = "https://www.orangefreesounds.com/wp-content/uploads/2014/10/Ding-sound.mp3"
     st.components.v1.html(f'<audio autoplay><source src="{sound_url}" type="audio/mp3"></audio>', height=0)
