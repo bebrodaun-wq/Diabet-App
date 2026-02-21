@@ -317,7 +317,7 @@ elif page == "🥗 Global Kitchen":
             if st.button("🚀 Start AI Analysis"):
                 if model:
                     with st.spinner("Analyzing..."):
-                        response = model.generate_content(["Identify dish, estimate macronutrients, and give diabetic advice in English.", image])
+                        response = model = genai.GenerativeModel('gemini-1.5-flash')
                         st.markdown(f"<div class='verdict-box'>{response.text}</div>", unsafe_allow_html=True)
 
 elif page == "🩺 Personal Log":
