@@ -8,11 +8,12 @@ from PIL import Image
 import time
 import random
 
-# ВНИМАНИЕ: Твой API-ключ теперь стал публичным. Рекомендуется создать новый в Google AI Studio.
+# ПРИМЕЧАНИЕ: Если ошибка 404 повторится, выполните в терминале: pip install -U google-generativeai
 API_KEY = "AIzaSyClRtASL4zQkbsLsDe4lXsyo2BwSvuMxCw" 
 
 try:
     genai.configure(api_key=API_KEY)
+    # Используем базовое имя модели. Если не работает, попробуйте 'gemini-1.5-flash-latest'
     model = genai.GenerativeModel('gemini-1.5-flash')
 except Exception as e:
     st.error(f"AI Setup Error: {e}")
@@ -319,18 +320,18 @@ elif page == "🥗 Global Kitchen":
                 if model:
                     with st.spinner("Analyzing..."):
                         try:
-                            # Правильный вызов генерации контента
                             prompt = "Identify dish, estimate macronutrients, and give diabetic advice in English."
                             response = model.generate_content([prompt, image])
                             
-                            if response and hasattr(response, 'text'):
+                            # Безопасная проверка ответа перед выводом
+                            if response and hasattr(response, 'text') and response.text:
                                 st.markdown(f"<div class='verdict-box'>{response.text}</div>", unsafe_allow_html=True)
                             else:
-                                st.error("Ошибка: Модель не смогла сгенерировать текст. Проверьте настройки или API ключ.")
+                                st.warning("AI did not return a text response. Please try another image.")
                         except Exception as e:
-                            st.error(f"AI Error: {e}")
+                            st.error(f"AI Connection Error: {e}. Try to update your library or check your API key.")
                 else:
-                    st.error("AI модель не настроена.")
+                    st.error("AI model is not configured properly.")
 
 elif page == "🩺 Personal Log":
     st.markdown("<div class='glass-card'><h3>🩺 Measurement Log</h3></div>", unsafe_allow_html=True)
