@@ -14,7 +14,7 @@ API_KEY = "AIzaSyClRtASL4zQkbsLsDe4lXsyo2BwSvuMxCw"
 try:
     genai.configure(api_key=API_KEY)
     # Используем базовое имя модели. Если не работает, попробуйте 'gemini-1.5-flash-latest'
-    model = genai.GenerativeModel('gemini-1.5-flash')
+    model = genai.GenerativeModel('gemini-1.5-flash-latest')
 except Exception as e:
     st.error(f"AI Setup Error: {e}")
     model = None
