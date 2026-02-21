@@ -8,11 +8,12 @@ from PIL import Image
 import time
 import random
 
+# ВНИМАНИЕ: Твой API-ключ теперь стал публичным. Рекомендуется создать новый в Google AI Studio.
 API_KEY = "AIzaSyClRtASL4zQkbsLsDe4lXsyo2BwSvuMxCw" 
 
 try:
     genai.configure(api_key=API_KEY)
-    model = genai.GenerativeModel('models/gemini-1.5-flash')
+    model = genai.GenerativeModel('gemini-1.5-flash')
 except Exception as e:
     st.error(f"AI Setup Error: {e}")
     model = None
@@ -317,13 +318,20 @@ elif page == "🥗 Global Kitchen":
             if st.button("🚀 Start AI Analysis"):
                 if model:
                     with st.spinner("Analyzing..."):
-                        response = model = genai.GenerativeModel('gemini-1.5-flash')
-                        response = model.generate_content(...)
-                        
-if response and hasattr(response, 'text'):
-    st.markdown(f"<div class='verdict-box'>{response.text}</div>", unsafe_allow_html=True)
-else:
-    st.error("Ошибка: Модель не смогла сгенерировать текст. Проверьте настройки или API ключ.")
+                        try:
+                            # Правильный вызов генерации контента
+                            prompt = "Identify dish, estimate macronutrients, and give diabetic advice in English."
+                            response = model.generate_content([prompt, image])
+                            
+                            if response and hasattr(response, 'text'):
+                                st.markdown(f"<div class='verdict-box'>{response.text}</div>", unsafe_allow_html=True)
+                            else:
+                                st.error("Ошибка: Модель не смогла сгенерировать текст. Проверьте настройки или API ключ.")
+                        except Exception as e:
+                            st.error(f"AI Error: {e}")
+                else:
+                    st.error("AI модель не настроена.")
+
 elif page == "🩺 Personal Log":
     st.markdown("<div class='glass-card'><h3>🩺 Measurement Log</h3></div>", unsafe_allow_html=True)
     with st.form("log"):
