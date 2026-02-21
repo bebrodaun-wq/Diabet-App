@@ -318,8 +318,12 @@ elif page == "🥗 Global Kitchen":
                 if model:
                     with st.spinner("Analyzing..."):
                         response = model = genai.GenerativeModel('gemini-1.5-flash')
-                        st.markdown(f"<div class='verdict-box'>{response.text}</div>", unsafe_allow_html=True)
-
+                        response = model.generate_content(...)
+                        
+if response and hasattr(response, 'text'):
+    st.markdown(f"<div class='verdict-box'>{response.text}</div>", unsafe_allow_html=True)
+else:
+    st.error("Ошибка: Модель не смогла сгенерировать текст. Проверьте настройки или API ключ.")
 elif page == "🩺 Personal Log":
     st.markdown("<div class='glass-card'><h3>🩺 Measurement Log</h3></div>", unsafe_allow_html=True)
     with st.form("log"):
