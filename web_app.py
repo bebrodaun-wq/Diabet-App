@@ -8,7 +8,7 @@ from PIL import Image
 import time
 import random
 
-API_KEY = "AIzaSyCWaBUD3xJkE5H9U0JIOUXYSXsXeP_nejw" 
+API_KEY = "AIzaSyClRtASL4zQkbsLsDe4lXsyo2BwSvuMxCw" 
 
 try:
     genai.configure(api_key=API_KEY)
