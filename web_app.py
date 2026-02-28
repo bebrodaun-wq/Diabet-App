@@ -8,16 +8,83 @@ from PIL import Image
 import time
 import random
 
-# ПРИМЕЧАНИЕ: Если ошибка 404 повторится, выполните в терминале: pip install -U google-generativeai
-API_KEY = "AIzaSyClRtASL4zQkbsLsDe4lXsyo2BwSvuMxCw" 
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Food Scanner</title>
+    <style>
+        body { font-family: sans-serif; display: flex; flex-direction: column; align-items: center; background-color: #f4f7f6; color: #333; padding: 20px; }
+        .container { background: white; padding: 2rem; border-radius: 15px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); width: 100%; max-width: 400px; text-align: center; }
+        #preview { width: 100%; border-radius: 10px; margin-top: 15px; display: none; }
+        .btn-upload { background: #4CAF50; color: white; padding: 12px 24px; border: none; border-radius: 5px; cursor: pointer; font-size: 16px; }
+        .result-box { margin-top: 20px; padding: 15px; border-left: 5px solid #4CAF50; background: #e8f5e9; display: none; text-align: left; }
+    </style>
+</head>
+<body>
 
-try:
-    genai.configure(api_key=API_KEY)
-    # Используем базовое имя модели. Если не работает, попробуйте 'gemini-1.5-flash-latest'
-    model = genai.GenerativeModel('gemini-1.5-flash-latest')
-except Exception as e:
-    st.error(f"AI Setup Error: {e}")
-    model = None
+<div class="container">
+    <h2>Сканер еды 🥗</h2>
+    <input type="file" id="imageInput" accept="image/*" style="display: none;">
+    <button class="btn-upload" onclick="document.getElementById('imageInput').click()">Сделать фото / Загрузить</button>
+
+    <img id="preview" src="" alt="Превью">
+    
+    <div id="loader" style="display: none; margin-top: 15px;">🔍 Анализирую...</div>
+
+    <div id="result" class="result-box">
+        <strong>Результат:</strong>
+        <p id="foodName"></p>
+        <p id="conf"></p>
+    </div>
+</div>
+
+<script>
+    const API_TOKEN = 'b160dbfe56921230ce62a4f9cbcd204c00eb6d00';
+    const imageInput = document.getElementById('imageInput');
+    const preview = document.getElementById('preview');
+    const resultBox = document.getElementById('result');
+    const loader = document.getElementById('loader');
+
+    imageInput.addEventListener('change', async (e) => {
+        const file = e.target.files[0];
+        if (!file) return;
+
+        preview.src = URL.createObjectURL(file);
+        preview.style.display = 'block';
+        loader.style.display = 'block';
+        resultBox.style.display = 'none';
+
+        const formData = new FormData();
+        formData.append('image', file);
+
+        try {
+            const response = await fetch('https://api.logmeal.es/v2/image/recognition/complete', {
+                method: 'POST',
+                headers: { 'Authorization': `Bearer ${API_TOKEN}` },
+                body: formData
+            });
+
+            if (!response.ok) throw new Error();
+
+            const data = await response.json();
+            const bestMatch = data.recognition_results[0].name;
+            
+            document.getElementById('foodName').innerText = 'Блюдо: ' + bestMatch;
+            document.getElementById('conf').innerText = 'Точность: ' + (data.recognition_results[0].prob * 100).toFixed(1) + '%';
+            
+            resultBox.style.display = 'block';
+        } catch (error) {
+            alert('Ошибка при распознавании');
+        } finally {
+            loader.style.display = 'none';
+        }
+    });
+</script>
+
+</body>
+</html>
 
 st.set_page_config(page_title="Help For Diabetic People", page_icon="💙", layout="wide")
 
