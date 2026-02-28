@@ -8,6 +8,8 @@ from PIL import Image
 import time
 import random
 
+# Оборачиваем твой HTML-код в строковую переменную, чтобы Python не ругался на теги
+scanner_html = """
 <!DOCTYPE html>
 <html lang="ru">
 <head>
@@ -85,6 +87,7 @@ import random
 
 </body>
 </html>
+"""
 
 st.set_page_config(page_title="Help For Diabetic People", page_icon="💙", layout="wide")
 
@@ -378,6 +381,10 @@ elif page == "🥗 Global Kitchen":
                         st.write(f"{j}. {step}")
 
     with t_ai:
+        # ВЫВОДИМ HTML-СКАНЕР ЗДЕСЬ
+        st.components.v1.html(scanner_html, height=550, scrolling=True)
+
+        # ТВОЙ ИСХОДНЫЙ КОД ДЛЯ GEMINI
         st.markdown("<div class='glass-card'><h3>📸 Virtual Analysis by Photo</h3><p>Upload a photo of your dish for Gemini AI analysis.</p></div>", unsafe_allow_html=True)
         file_img = st.file_uploader("Upload plate photo", type=["jpg", "png", "jpeg"], key="food_scanner")
         if file_img:
