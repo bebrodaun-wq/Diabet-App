@@ -3,91 +3,10 @@ import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
 import base64
-import google.generativeai as genai
+import requests # Добавлен для работы с API LogMeal
 from PIL import Image
 import time
 import random
-
-# Оборачиваем твой HTML-код в строковую переменную, чтобы Python не ругался на теги
-scanner_html = """
-<!DOCTYPE html>
-<html lang="ru">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AI Food Scanner</title>
-    <style>
-        body { font-family: sans-serif; display: flex; flex-direction: column; align-items: center; background-color: #f4f7f6; color: #333; padding: 20px; }
-        .container { background: white; padding: 2rem; border-radius: 15px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); width: 100%; max-width: 400px; text-align: center; }
-        #preview { width: 100%; border-radius: 10px; margin-top: 15px; display: none; }
-        .btn-upload { background: #4CAF50; color: white; padding: 12px 24px; border: none; border-radius: 5px; cursor: pointer; font-size: 16px; }
-        .result-box { margin-top: 20px; padding: 15px; border-left: 5px solid #4CAF50; background: #e8f5e9; display: none; text-align: left; }
-    </style>
-</head>
-<body>
-
-<div class="container">
-    <h2>Сканер еды 🥗</h2>
-    <input type="file" id="imageInput" accept="image/*" style="display: none;">
-    <button class="btn-upload" onclick="document.getElementById('imageInput').click()">Сделать фото / Загрузить</button>
-
-    <img id="preview" src="" alt="Превью">
-    
-    <div id="loader" style="display: none; margin-top: 15px;">🔍 Анализирую...</div>
-
-    <div id="result" class="result-box">
-        <strong>Результат:</strong>
-        <p id="foodName"></p>
-        <p id="conf"></p>
-    </div>
-</div>
-
-<script>
-    const API_TOKEN = 'b160dbfe56921230ce62a4f9cbcd204c00eb6d00';
-    const imageInput = document.getElementById('imageInput');
-    const preview = document.getElementById('preview');
-    const resultBox = document.getElementById('result');
-    const loader = document.getElementById('loader');
-
-    imageInput.addEventListener('change', async (e) => {
-        const file = e.target.files[0];
-        if (!file) return;
-
-        preview.src = URL.createObjectURL(file);
-        preview.style.display = 'block';
-        loader.style.display = 'block';
-        resultBox.style.display = 'none';
-
-        const formData = new FormData();
-        formData.append('image', file);
-
-        try {
-            const response = await fetch('https://api.logmeal.es/v2/image/recognition/complete', {
-                method: 'POST',
-                headers: { 'Authorization': `Bearer ${API_TOKEN}` },
-                body: formData
-            });
-
-            if (!response.ok) throw new Error();
-
-            const data = await response.json();
-            const bestMatch = data.recognition_results[0].name;
-            
-            document.getElementById('foodName').innerText = 'Блюдо: ' + bestMatch;
-            document.getElementById('conf').innerText = 'Точность: ' + (data.recognition_results[0].prob * 100).toFixed(1) + '%';
-            
-            resultBox.style.display = 'block';
-        } catch (error) {
-            alert('Ошибка при распознавании');
-        } finally {
-            loader.style.display = 'none';
-        }
-    });
-</script>
-
-</body>
-</html>
-"""
 
 st.set_page_config(page_title="Help For Diabetic People", page_icon="💙", layout="wide")
 
@@ -381,31 +300,43 @@ elif page == "🥗 Global Kitchen":
                         st.write(f"{j}. {step}")
 
     with t_ai:
-        # ВЫВОДИМ HTML-СКАНЕР ЗДЕСЬ
-        st.components.v1.html(scanner_html, height=550, scrolling=True)
-
-        # ТВОЙ ИСХОДНЫЙ КОД ДЛЯ GEMINI
-        st.markdown("<div class='glass-card'><h3>📸 Virtual Analysis by Photo</h3><p>Upload a photo of your dish for Gemini AI analysis.</p></div>", unsafe_allow_html=True)
+        st.markdown("<div class='glass-card'><h3>📸 AI Food Scanner</h3><p>Upload a photo of your dish for LogMeal API analysis.</p></div>", unsafe_allow_html=True)
         file_img = st.file_uploader("Upload plate photo", type=["jpg", "png", "jpeg"], key="food_scanner")
+        
         if file_img:
             image = Image.open(file_img)
             st.image(image, width=400)
+            
             if st.button("🚀 Start AI Analysis"):
-                if model:
-                    with st.spinner("Analyzing..."):
-                        try:
-                            prompt = "Identify dish, estimate macronutrients, and give diabetic advice in English."
-                            response = model.generate_content([prompt, image])
-                            
-                            # Безопасная проверка ответа перед выводом
-                            if response and hasattr(response, 'text') and response.text:
-                                st.markdown(f"<div class='verdict-box'>{response.text}</div>", unsafe_allow_html=True)
+                with st.spinner("🔍 Анализирую..."):
+                    try:
+                        # Запрос к LogMeal напрямую из Python
+                        url = 'https://api.logmeal.es/v2/image/recognition/complete'
+                        headers = {'Authorization': 'Bearer b160dbfe56921230ce62a4f9cbcd204c00eb6d00'}
+                        files = {'image': (file_img.name, file_img.getvalue(), file_img.type)}
+                        
+                        response = requests.post(url, headers=headers, files=files)
+                        
+                        if response.status_code == 200:
+                            data = response.json()
+                            if 'recognition_results' in data and len(data['recognition_results']) > 0:
+                                best_match = data['recognition_results'][0]['name']
+                                prob = data['recognition_results'][0]['prob'] * 100
+                                
+                                st.markdown(f"""
+                                <div class='verdict-box'>
+                                    <strong>✅ Результат распознавания:</strong><br><br>
+                                    🍽️ Блюдо: <b>{best_match}</b><br>
+                                    🎯 Точность: <b>{prob:.1f}%</b>
+                                </div>
+                                """, unsafe_allow_html=True)
                             else:
-                                st.warning("AI did not return a text response. Please try another image.")
-                        except Exception as e:
-                            st.error(f"AI Connection Error: {e}. Try to update your library or check your API key.")
-                else:
-                    st.error("AI model is not configured properly.")
+                                st.warning("Не удалось распознать еду на фото.")
+                        else:
+                            st.error(f"Ошибка API (Код {response.status_code}): {response.text}")
+                            
+                    except Exception as e:
+                        st.error(f"Ошибка соединения: {e}")
 
 elif page == "🩺 Personal Log":
     st.markdown("<div class='glass-card'><h3>🩺 Measurement Log</h3></div>", unsafe_allow_html=True)
